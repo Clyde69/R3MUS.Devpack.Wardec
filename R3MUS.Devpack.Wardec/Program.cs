@@ -19,7 +19,7 @@ namespace R3MUS.Devpack.Wardec
 {
     class Program
     {
-        private static CharacterKey cKey = EveXml.CreateCharacterKey(4232966, "dvb8nHXuh44ZRYwicVGpSjhFY5gxKScPtFZHGDeQxcwgxtYZy0fbat9NVft7fWH5");
+        private static CharacterKey cKey = EveXml.CreateCharacterKey(0, "");
 
         private static List<Character> chars = cKey.Characters.ToList();
         
