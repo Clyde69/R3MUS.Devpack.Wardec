@@ -33,28 +33,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="EveAI.Live">
-      <HintPath>..\..\..\Source\Repos\ReconnectedServerStuff\JKON.EveWho\bin\Debug\EveAI.Live.dll</HintPath>
-    </Reference>
-    <Reference Include="EveLib.Core, Version=3.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\eZet.EveLib.Core.3.0.9\lib\net45\EveLib.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EveLib.EveAuth, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\eZet.EveLib.EveAuth.3.0.1.0\lib\net45\EveLib.EveAuth.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EveLib.EveCrest, Version=3.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\eZet.EveLib.EveCrest.3.4.4\lib\net45\EveLib.EveCrest.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EveLib.EveXml, Version=3.0.9.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\eZet.EveLib.EveXml.3.0.9\lib\net45\EveLib.EveXml.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\..\ReconnectedServerStuff\JKON.EveWho\bin\Debug\EveAI.Live.dll</HintPath>
     </Reference>
     <Reference Include="JKON.EveWho, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Source\Repos\ReconnectedServerStuff\JKON.EveWho\bin\Debug\JKON.EveWho.dll</HintPath>
+      <HintPath>..\..\ReconnectedServerStuff\JKON.EveWho\bin\Debug\JKON.EveWho.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -73,10 +65,13 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="R3MUS.Devpack.Slack">
-      <HintPath>..\..\..\Source\Repos\SlackClient\R3MUS.Devpack.Slack\bin\Debug\R3MUS.Devpack.Slack.dll</HintPath>
+      <HintPath>..\..\SlackClient\R3MUS.Devpack.Slack\bin\Debug\R3MUS.Devpack.Slack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -85,11 +80,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Category.cs" />
     <Compile Include="Content.cs" />
-    <Compile Include="CourseDetailsViewResponseModel.cs" />
-    <Compile Include="CourseStatus.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="PerSessionBookingType.cs" />
+    <Compile Include="MembershipUser.cs" />
+    <Compile Include="Post.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -97,7 +91,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ResourceModel.cs" />
+    <Compile Include="Topic.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

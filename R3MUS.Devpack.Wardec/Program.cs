@@ -1,27 +1,22 @@
-﻿using eZet.EveLib.EveCrestModule;
-using eZet.EveLib.EveXmlModule;
-using eZet.EveLib.EveXmlModule.Models.Character;
-using eZet.EveLib.EveXmlModule.Models.Corporation;
-using JKON.EveWho.Corporation;
+﻿using JKON.EveWho.Corporation;
 using JKON.EveWho.Wars;
-using Legend.Shared.SportsCourseServices.Models.CourseDetailsSummary;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace R3MUS.Devpack.Wardec
 {
     class Program
     {
-        private static CharacterKey cKey = EveXml.CreateCharacterKey(0, "");
 
-        private static List<Character> chars = cKey.Characters.ToList();
+        static long corpId = Properties.Settings.Default.HomeCorp;
+        static long allId = Properties.Settings.Default.HomeAlliance;
+
+        private static string WarMessage = "SANGUINE ALERT! WARDECS LIVE! Highsec is still a hive of scum & villainy.";
+        private static string NoWarMessage = "VERDANT ALERT! NO WARDECS! Highsec is still a hive of scum & villainy.";
         
         static void Main(string[] args)
         {
@@ -35,6 +30,7 @@ namespace R3MUS.Devpack.Wardec
         static void GetWars_ESI()
         {
             var ourWars = new List<long>();
+            var removeWars = new List<long>();
             try
             {
                 ourWars = Properties.Settings.Default.CurrentWars.Split(',').Select(s => Int64.Parse(s)).ToList();
@@ -43,6 +39,7 @@ namespace R3MUS.Devpack.Wardec
             {
 
             }
+            var atWar = ourWars.Any();
             var counter = 0;
 
             var allWars = War.GetWars().OrderBy(w => w).ToList();
@@ -85,10 +82,22 @@ namespace R3MUS.Devpack.Wardec
                     catch (Exception e) {
                         SendMessage("Well, you can't seem to get details of a war that's ended :(", e.Message, "#ff0000");
                     }
-
-                    ourWars.Remove(f);
+                    
+                    removeWars.Add(f);
                 }
             });
+            ourWars = ourWars.Except(removeWars).ToList();
+
+            if(ourWars.Any() && atWar != ourWars.Any())
+            {
+                Slack.Plugin.SetChannelTopic(Properties.Settings.Default.Group, Properties.Settings.Default.Room,
+                    Properties.Settings.Default.Token, WarMessage);
+            }
+            else if (!ourWars.Any() && atWar != ourWars.Any())
+            {
+                Slack.Plugin.SetChannelTopic(Properties.Settings.Default.Group, Properties.Settings.Default.Room,
+                    Properties.Settings.Default.Token, NoWarMessage);
+            }
 
             Properties.Settings.Default.CurrentWars = String.Join(",", ourWars.Select(i => i.ToString()).ToArray());
 
@@ -103,13 +112,13 @@ namespace R3MUS.Devpack.Wardec
         {
             var warDeets = new War(warId);
             if (
-                (warDeets.Aggressor.Alliance_Id == chars.First().AllianceId)
+                (warDeets.Aggressor.Alliance_Id == allId)
                 ||
-                (warDeets.Aggressor.Corporation_Id == chars.First().CorporationId)
+                (warDeets.Aggressor.Corporation_Id == corpId)
                 ||
-                (warDeets.Defender.Alliance_Id == chars.First().AllianceId)
+                (warDeets.Defender.Alliance_Id == allId)
                 ||
-                (warDeets.Defender.Corporation_Id == chars.First().CorporationId)
+                (warDeets.Defender.Corporation_Id == corpId)
             )
             {
                 var name = string.Empty;
@@ -145,6 +154,7 @@ namespace R3MUS.Devpack.Wardec
                 }
 
                 SendMessage(name, string.Format("War {0}: {1}", type, dt.ToString()), colour);
+                AddPost(string.Format("War {0}: {1}", type, dt.ToString()), name);
 
                 return warId;
             }
@@ -152,6 +162,27 @@ namespace R3MUS.Devpack.Wardec
             {
                 return null;
             }
+        }
+
+        static string AddPost(string name, string warName)
+        {
+            return BaseRequest(string.Format(Properties.Settings.Default.AddURI, name, warName, WarMessage));
+        }
+
+        static string ScrapPost(string warName)
+        {
+            return BaseRequest(string.Format(Properties.Settings.Default.ScrapURI, warName));
+        }
+
+        static string BaseRequest(string url)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.UserAgent = "R3MUS.Devpack.EveWho-Clyde-en-Marland";
+            WebResponse response = request.GetResponse();
+            Stream stream = response.GetResponseStream();
+            StreamReader reader = new StreamReader(stream);
+
+            return reader.ReadToEnd();
         }
 
         static void SendMessage(string title, string text, string colour)
@@ -171,119 +202,44 @@ namespace R3MUS.Devpack.Wardec
             return new Alliance(id);
         }
 
-        static JKON.EveWho.Corporation.Corporation GetCorporation(long id)
+        static Corporation GetCorporation(long id)
         {
             return new JKON.EveWho.Corporation.Corporation(id);
         }
+        
+        //static void POSTest()
+        //{
+        //    var cKey = EveXml.CreateCorporationKey(, "");
+        //    var poses = cKey.Corporation.GetStarbaseList().Result.Starbases.ToList();
 
-        static void PingNotifications()
-        {
-            var notes1 = new List<NotificationList.Notification>();
-            var texts = new List<NotificationTexts.Notification>();
+        //    poses.ForEach(pos =>
+        //    {
+        //        var posDetails = cKey.Corporation.GetStarbaseDetails(pos.ItemId).Result;
 
-            chars.ForEach(toon => 
-            {
-                var toonNotes = toon.GetNotifications().Result.Notifications;
-                notes1.AddRange(toonNotes);
-                if (toonNotes.Any())
-                {
-                    texts.AddRange(toon.GetNotificationTexts(toonNotes.Select(note => note.NotificationId).ToArray()).Result.Notifications.ToList());
-                }
-            });
-
-            notes1 = notes1.GroupBy(note => note.NotificationId).Select(grp => grp.First()).OrderBy(note => note.NotificationId).ToList();
-            texts = texts.GroupBy(grp => grp.NotificationId).Select(grp => grp.First()).ToList();
-
-            var text = texts.Where(t => t.NotificationId == 616759473).First();
-            
-            var includeIds = new List<long>();
-            includeIds.Add(5);
-            includeIds.Add(6);
-            includeIds.Add(7);
-            includeIds.Add(8);
-            includeIds.Add(27);
-            includeIds.Add(28);
-            includeIds.Add(29);
-            includeIds.Add(30);
-            includeIds.Add(31);
-
-            var warNotes = notes1.Where(note => includeIds.Contains(note.TypeId)).ToList();
-
-            var all = EveXml.Eve.GetAllianceList().Result.Alliances.ToList();
-
-            //Console.WriteLine("All:");
-            //WriteTexts(notes1, texts);
-            //Console.WriteLine("");
-            Console.WriteLine("War:");
-            WriteTexts(warNotes, texts);
-            
-            //if (notes1.Count() > 0)
-            //{
-            //    Properties.Settings.Default.LastMessageId = notes1.Select(note => note.NotificationId).Max();
-            //    Properties.Settings.Default.Save();
-            //}
-            Console.WriteLine("That's all folks...");
-            Console.ReadLine();
-        }
-
-        static void POSTest()
-        {
-            var cKey = EveXml.CreateCorporationKey(4285630, "hmZDX0Ptrvb33GscSJVfeRy6rogh06XcymVI9GdueMahoRxZDvh0lWsOeGiBaKbS");
-            var poses = cKey.Corporation.GetStarbaseList().Result.Starbases.ToList();
-
-            poses.ForEach(pos =>
-            {
-                var posDetails = cKey.Corporation.GetStarbaseDetails(pos.ItemId).Result;
-
-                Console.WriteLine(pos.ItemId);
-                Console.WriteLine(pos.LocationId);
-                Console.WriteLine(pos.MoonId);
+        //        Console.WriteLine(pos.ItemId);
+        //        Console.WriteLine(pos.LocationId);
+        //        Console.WriteLine(pos.MoonId);
                 
-                Console.WriteLine(posDetails.OnlineTimestampAsString);
-                Console.WriteLine(posDetails.State);
-                Console.WriteLine(posDetails.StateTimestampAsString);
-                Console.WriteLine();
+        //        Console.WriteLine(posDetails.OnlineTimestampAsString);
+        //        Console.WriteLine(posDetails.State);
+        //        Console.WriteLine(posDetails.StateTimestampAsString);
+        //        Console.WriteLine();
 
-                var assets = cKey.Corporation.GetAssetList().Result.Items.Where(item => item.LocationId == pos.LocationId).ToList();
+        //        var assets = cKey.Corporation.GetAssetList().Result.Items.Where(item => item.LocationId == pos.LocationId).ToList();
 
-                assets.ForEach(asset => {
-                    Console.WriteLine(asset.ItemId);
-                    //var typeName = EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result.Types;
-                    var types = EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result.Types.ToList();
-                    types.ForEach(type => {
-                        Console.WriteLine(type.TypeName);
-                    });
-                    //Console.WriteLine(EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result);
-                    Console.WriteLine(asset.Quantity);
-                });
-            });
+        //        assets.ForEach(asset => {
+        //            Console.WriteLine(asset.ItemId);
+        //            //var typeName = EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result.Types;
+        //            var types = EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result.Types.ToList();
+        //            types.ForEach(type => {
+        //                Console.WriteLine(type.TypeName);
+        //            });
+        //            //Console.WriteLine(EveXml.Eve.GetTypeName(new long[] { asset.TypeId }).Result);
+        //            Console.WriteLine(asset.Quantity);
+        //        });
+        //    });
 
-            Console.ReadLine();
-        }
-
-        static void WriteTexts(List<NotificationList.Notification> notes,List<NotificationTexts.Notification> texts)
-        {
-            notes.ForEach(note =>
-            {
-                var text = texts.Where(txt => txt.NotificationId == note.NotificationId).First();
-
-                var contentString = text.Content.Replace("\n", ", ");
-                if (contentString.Contains("applicationText:") && !contentString.Contains("''"))
-                {
-                    var splta = contentString.Split(':');
-                    var splta2 = splta[1].Split(new string[] { ", charId:" }, StringSplitOptions.RemoveEmptyEntries);
-                    splta[1] = string.Format("'{0}', charId", splta2[0].Replace("'", ""));
-                    contentString = string.Join(": ", splta);
-                }
-                var jsonString = string.Concat("{", contentString, "}");
-
-                var content = JsonConvert.DeserializeObject<Content>(jsonString);
-
-                Console.WriteLine(string.Format("Notification Id {0}\n Type Id {1}\n Content {2}",
-                    text.NotificationId,
-                    note.TypeId,
-                    text.Content));
-            });
-        }
+        //    Console.ReadLine();
+        //}        
     }
 }
