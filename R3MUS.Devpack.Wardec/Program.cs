@@ -1,11 +1,9 @@
-﻿using JKON.EveWho.Corporation;
-using JKON.EveWho.Wars;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using R3MUS.Devpack.ESI.Models;
 
 namespace R3MUS.Devpack.Wardec
 {
@@ -15,8 +13,8 @@ namespace R3MUS.Devpack.Wardec
         static long corpId = Properties.Settings.Default.HomeCorp;
         static long allId = Properties.Settings.Default.HomeAlliance;
 
-        private static string WarMessage = "SANGUINE ALERT! WARDECS LIVE! Highsec is still a hive of scum & villainy.";
-        private static string NoWarMessage = "VERDANT ALERT! NO WARDECS! Highsec is still a hive of scum & villainy.";
+        private static string WarMessage = "SANGUINE ALERT! WARDECS LIVE! Highsec is still a hive of scum and villainy.";
+        private static string NoWarMessage = "VERDANT ALERT! NO WARDECS! Highsec is still a hive of scum and villainy.";
         
         static void Main(string[] args)
         {
@@ -42,9 +40,11 @@ namespace R3MUS.Devpack.Wardec
             var atWar = ourWars.Any();
             var counter = 0;
 
-            var allWars = War.GetWars().OrderBy(w => w).ToList();
+            var allWars = War.GetWarIds().OrderBy(w => w).ToList();
 
             var newWars = allWars.Where(w => w > Properties.Settings.Default.LastMessageId).ToList();
+
+            Console.WriteLine(string.Format("Starting at war ID {0}", (Properties.Settings.Default.LastMessageId + 1).ToString()));
 
             newWars.ForEach(w =>
             {
@@ -73,18 +73,25 @@ namespace R3MUS.Devpack.Wardec
 
             ourWars.ForEach(f =>
             {
-                if (!allWars.Contains(f))
+                var warDeets = new War(f);
+                if(warDeets.EndTime.HasValue)
                 {
-                    try
-                    {
-                        var x = PingWar(f, "Ended");
-                    }
-                    catch (Exception e) {
-                        SendMessage("Well, you can't seem to get details of a war that's ended :(", e.Message, "#ff0000");
-                    }
-                    
+                    PingWar(f, "Ended");
                     removeWars.Add(f);
                 }
+                //var war = allWars.Where(w => w == f).First();
+                //if (!allWars.Contains(f))
+                //{
+                //    try
+                //    {
+                //        var x = PingWar(f, "Ended");
+                //    }
+                //    catch (Exception e) {
+                //        SendMessage("Well, you can't seem to get details of a war that's ended :(", e.Message, "#ff0000");
+                //    }
+
+                //    removeWars.Add(f);
+                //}
             });
             ourWars = ourWars.Except(removeWars).ToList();
 
@@ -125,7 +132,7 @@ namespace R3MUS.Devpack.Wardec
 
                 if (warDeets.Aggressor.Alliance_Id.HasValue)
                 {
-                    name = GetAlliance(warDeets.Aggressor.Alliance_Id.Value).Alliance_Name;
+                    name = GetAlliance(warDeets.Aggressor.Alliance_Id.Value).Name;
                 }
                 else
                 {
@@ -133,7 +140,7 @@ namespace R3MUS.Devpack.Wardec
                 }
                 if (warDeets.Defender.Alliance_Id.HasValue)
                 {
-                    name = string.Concat(name, " vs ", GetAlliance(warDeets.Defender.Alliance_Id.Value).Alliance_Name);
+                    name = string.Concat(name, " vs ", GetAlliance(warDeets.Defender.Alliance_Id.Value).Name);
                 }
                 else
                 {
@@ -144,17 +151,18 @@ namespace R3MUS.Devpack.Wardec
                 var colour = string.Empty;
                 if(type == "Started")
                 {
-                    dt = warDeets.Declared;
+                    dt = warDeets.StartTime != null? warDeets.StartTime: warDeets.Declared;
                     colour = "#ff80bf";
+                    AddPost(string.Format("War {0} {1}", type, dt.ToString("yyyy-MM-dd HHmm")), name);
                 }
                 else
                 {
-                    dt = DateTime.UtcNow;
+                    dt = warDeets.EndTime.Value;
                     colour = "#ffe6f2";
+                    ScrapPost(name);
                 }
 
                 SendMessage(name, string.Format("War {0}: {1}", type, dt.ToString()), colour);
-                AddPost(string.Format("War {0}: {1}", type, dt.ToString()), name);
 
                 return warId;
             }
@@ -197,14 +205,14 @@ namespace R3MUS.Devpack.Wardec
                 Properties.Settings.Default.BotName);
         }
 
-        static Alliance GetAlliance(long id)
+        static ESI.Models.Alliance.Detail GetAlliance(long id)
         {
-            return new Alliance(id);
+            return new ESI.Models.Alliance.Detail(id);
         }
 
-        static Corporation GetCorporation(long id)
+        static Corporation.Detail GetCorporation(long id)
         {
-            return new JKON.EveWho.Corporation.Corporation(id);
+            return new Corporation.Detail(id);
         }
         
         //static void POSTest()

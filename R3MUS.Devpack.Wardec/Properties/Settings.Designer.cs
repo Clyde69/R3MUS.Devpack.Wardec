@@ -25,7 +25,7 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("538762")]
         public long LastMessageId {
             get {
                 return ((long)(this["LastMessageId"]));
@@ -76,7 +76,7 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("xoxs-4459251457-9901405956-119904588608-e4c18c7d9a")]
+        [global::System.Configuration.DefaultSettingValueAttribute("xoxb-7037557250-iIxD9Vgm1UlZdpbXpXJEJR4d")]
         public string Token {
             get {
                 return ((string)(this["Token"]));
