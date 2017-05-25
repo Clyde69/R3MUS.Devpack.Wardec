@@ -74,24 +74,11 @@ namespace R3MUS.Devpack.Wardec
             ourWars.ForEach(f =>
             {
                 var warDeets = new War(f);
-                if(warDeets.EndTime.HasValue)
+                if(warDeets.EndTime.HasValue && warDeets.EndTime.Value < DateTime.UtcNow)
                 {
                     PingWar(f, "Ended");
                     removeWars.Add(f);
                 }
-                //var war = allWars.Where(w => w == f).First();
-                //if (!allWars.Contains(f))
-                //{
-                //    try
-                //    {
-                //        var x = PingWar(f, "Ended");
-                //    }
-                //    catch (Exception e) {
-                //        SendMessage("Well, you can't seem to get details of a war that's ended :(", e.Message, "#ff0000");
-                //    }
-
-                //    removeWars.Add(f);
-                //}
             });
             ourWars = ourWars.Except(removeWars).ToList();
 
