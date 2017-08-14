@@ -2,38 +2,38 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="R3MUS.Devpack.Wardec.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="LastMessageId" Type="System.Int64" Scope="User">
-      <Value Profile="(Default)">538762</Value>
-    </Setting>
     <Setting Name="CurrentWars" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="Group" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
     <Setting Name="Room" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">it_testing</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="BotName" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Skynet</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SlackWebhook" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://hooks.slack.com/services/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</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Token" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">xoxb-7037557250-iIxD9Vgm1UlZdpbXpXJEJR4d</Value>
-    </Setting>
-    <Setting Name="Group" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">r3mus</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HomeCorp" Type="System.Int64" Scope="Application">
-      <Value Profile="(Default)">98389365</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="HomeAlliance" Type="System.Int64" Scope="Application">
-      <Value Profile="(Default)">99005393</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AddURI" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:68/api/war/add/{0}/{1}/{2}</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ScrapURI" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:68/api/war/scrap/{0}</Value>
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="LastMessageId" Type="System.Int64" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

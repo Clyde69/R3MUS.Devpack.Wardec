@@ -104,92 +104,129 @@ namespace R3MUS.Devpack.Wardec
 
         static long? PingWar(long warId, string type)
         {
-            var warDeets = new War(warId);
-            if (
-                (warDeets.Aggressor.Alliance_Id == allId)
-                ||
-                (warDeets.Aggressor.Corporation_Id == corpId)
-                ||
-                (warDeets.Defender.Alliance_Id == allId)
-                ||
-                (warDeets.Defender.Corporation_Id == corpId)
-            )
+            try
             {
-                var name = string.Empty;
-
-                if (warDeets.Aggressor.Alliance_Id.HasValue)
+                var warDeets = new War(warId);
+                if (
+                    (warDeets.Aggressor.Alliance_Id == allId)
+                    ||
+                    (warDeets.Aggressor.Corporation_Id == corpId)
+                    ||
+                    (warDeets.Defender.Alliance_Id == allId)
+                    ||
+                    (warDeets.Defender.Corporation_Id == corpId)
+                )
                 {
-                    name = GetAlliance(warDeets.Aggressor.Alliance_Id.Value).Name;
+                    var name = string.Empty;
+
+                    if (warDeets.Aggressor.Alliance_Id.HasValue)
+                    {
+                        name = GetAlliance(warDeets.Aggressor.Alliance_Id.Value).Name;
+                    }
+                    else
+                    {
+                        name = GetCorporation(warDeets.Aggressor.Corporation_Id.Value).Corporation_Name;
+                    }
+                    if (warDeets.Defender.Alliance_Id.HasValue)
+                    {
+                        name = string.Concat(name, " vs ", GetAlliance(warDeets.Defender.Alliance_Id.Value).Name);
+                    }
+                    else
+                    {
+                        name = string.Concat(name, " vs ", GetCorporation(warDeets.Defender.Corporation_Id.Value).Corporation_Name);
+                    }
+
+                    var dt = new DateTime();
+                    var colour = string.Empty;
+                    if (type == "Started")
+                    {
+                        dt = warDeets.StartTime != null ? warDeets.StartTime : warDeets.Declared;
+                        colour = "#ff80bf";
+                        AddPost(string.Format("War {0} {1}", type, dt.ToString("yyyy-MM-dd HHmm")), name);
+                    }
+                    else
+                    {
+                        dt = warDeets.EndTime.Value;
+                        colour = "#ffe6f2";
+                        ScrapPost(name);
+                    }
+
+                    SendMessage(name, string.Format("War {0}: {1}", type, dt.ToString()), colour);
+
+                    return warId;
                 }
                 else
                 {
-                    name = GetCorporation(warDeets.Aggressor.Corporation_Id.Value).Corporation_Name;
+                    return null;
                 }
-                if (warDeets.Defender.Alliance_Id.HasValue)
-                {
-                    name = string.Concat(name, " vs ", GetAlliance(warDeets.Defender.Alliance_Id.Value).Name);
-                }
-                else
-                {
-                    name = string.Concat(name, " vs ", GetCorporation(warDeets.Defender.Corporation_Id.Value).Corporation_Name);
-                }
-
-                var dt = new DateTime();
-                var colour = string.Empty;
-                if(type == "Started")
-                {
-                    dt = warDeets.StartTime != null? warDeets.StartTime: warDeets.Declared;
-                    colour = "#ff80bf";
-                    AddPost(string.Format("War {0} {1}", type, dt.ToString("yyyy-MM-dd HHmm")), name);
-                }
-                else
-                {
-                    dt = warDeets.EndTime.Value;
-                    colour = "#ffe6f2";
-                    ScrapPost(name);
-                }
-
-                SendMessage(name, string.Format("War {0}: {1}", type, dt.ToString()), colour);
-
-                return warId;
             }
-            else
+            catch(Exception ex)
             {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(string.Format("{0}: {1}", type, warId.ToString()));
                 return null;
             }
         }
 
         static string AddPost(string name, string warName)
         {
-            return BaseRequest(string.Format(Properties.Settings.Default.AddURI, name, warName, WarMessage));
+            if (Properties.Settings.Default.AddURI != string.Empty)
+            {
+                return BaseRequest(string.Format(Properties.Settings.Default.AddURI, name, warName, WarMessage));
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         static string ScrapPost(string warName)
         {
-            return BaseRequest(string.Format(Properties.Settings.Default.ScrapURI, warName));
+            if (Properties.Settings.Default.AddURI != string.Empty)
+            {
+                return BaseRequest(string.Format(Properties.Settings.Default.ScrapURI, warName));
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         static string BaseRequest(string url)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.UserAgent = "R3MUS.Devpack.EveWho-Clyde-en-Marland";
-            WebResponse response = request.GetResponse();
-            Stream stream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(stream);
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                request.UserAgent = "R3MUS.Devpack.EveWho-Clyde-en-Marland";
+                WebResponse response = request.GetResponse();
+                Stream stream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(stream);
 
-            return reader.ReadToEnd();
+                return reader.ReadToEnd();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(url);
+                Console.ReadLine();
+                return string.Empty;
+            }
         }
 
         static void SendMessage(string title, string text, string colour)
         {
-            var att = new Slack.MessagePayloadAttachment() { Title = title, Text = text, Colour = colour };
-            var payload = new Slack.MessagePayload() { Channel = Properties.Settings.Default.Room, Username = Properties.Settings.Default.BotName,
-                Text = "Status Report", Attachments = new List<Slack.MessagePayloadAttachment>() };
-            payload.Attachments.Add(att);
-            Slack.Plugin.SendToRoom(payload,
-                Properties.Settings.Default.Room,
-                Properties.Settings.Default.SlackWebhook,
-                Properties.Settings.Default.BotName);
+            if(Properties.Settings.Default.Room != string.Empty && Properties.Settings.Default.Token != string.Empty)
+            {
+                var att = new Slack.MessagePayloadAttachment() { Title = title, Text = text, Colour = colour };
+                var payload = new Slack.MessagePayload() { Channel = Properties.Settings.Default.Room, Username = Properties.Settings.Default.BotName,
+                    Text = "Status Report", Attachments = new List<Slack.MessagePayloadAttachment>() };
+                payload.Attachments.Add(att);
+                Slack.Plugin.SendToRoom(payload,
+                    Properties.Settings.Default.Room,
+                    Properties.Settings.Default.SlackWebhook,
+                    Properties.Settings.Default.BotName);
+            }
         }
 
         static ESI.Models.Alliance.Detail GetAlliance(long id)
@@ -197,9 +234,9 @@ namespace R3MUS.Devpack.Wardec
             return new ESI.Models.Alliance.Detail(id);
         }
 
-        static Corporation.Detail GetCorporation(long id)
+        static ESI.Models.Corporation.Detail GetCorporation(long id)
         {
-            return new Corporation.Detail(id);
+            return new ESI.Models.Corporation.Detail(id);
         }
         
         //static void POSTest()

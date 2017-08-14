@@ -25,18 +25,6 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("538762")]
-        public long LastMessageId {
-            get {
-                return ((long)(this["LastMessageId"]));
-            }
-            set {
-                this["LastMessageId"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string CurrentWars {
             get {
@@ -49,43 +37,7 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("it_testing")]
-        public string Room {
-            get {
-                return ((string)(this["Room"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Skynet")]
-        public string BotName {
-            get {
-                return ((string)(this["BotName"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://hooks.slack.com/services/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")]
-        public string SlackWebhook {
-            get {
-                return ((string)(this["SlackWebhook"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("xoxb-7037557250-iIxD9Vgm1UlZdpbXpXJEJR4d")]
-        public string Token {
-            get {
-                return ((string)(this["Token"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("r3mus")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Group {
             get {
                 return ((string)(this["Group"]));
@@ -94,7 +46,42 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("98389365")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Room {
+            get {
+                return ((string)(this["Room"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BotName {
+            get {
+                return ((string)(this["BotName"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SlackWebhook {
+            get {
+                return ((string)(this["SlackWebhook"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Token {
+            get {
+                return ((string)(this["Token"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public long HomeCorp {
             get {
                 return ((long)(this["HomeCorp"]));
@@ -103,7 +90,6 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("99005393")]
         public long HomeAlliance {
             get {
                 return ((long)(this["HomeAlliance"]));
@@ -112,7 +98,7 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:68/api/war/add/{0}/{1}/{2}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string AddURI {
             get {
                 return ((string)(this["AddURI"]));
@@ -121,10 +107,21 @@ namespace R3MUS.Devpack.Wardec.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:68/api/war/scrap/{0}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ScrapURI {
             get {
                 return ((string)(this["ScrapURI"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public long LastMessageId {
+            get {
+                return ((long)(this["LastMessageId"]));
+            }
+            set {
+                this["LastMessageId"] = value;
             }
         }
     }

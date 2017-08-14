@@ -64,7 +64,8 @@
       <HintPath>..\packages\R3MUS.Devpack.Core.1.0.0\lib\net452\R3MUS.Devpack.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="R3MUS.Devpack.ESI">
+    <Reference Include="R3MUS.Devpack.ESI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\R3MUS.Devpack.ESI\R3MUS.Devpack.ESI\bin\Debug\R3MUS.Devpack.ESI.dll</HintPath>
     </Reference>
     <Reference Include="R3MUS.Devpack.Slack">
